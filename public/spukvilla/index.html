@@ -89,6 +89,27 @@ input[type=range]{width:100%;accent-color:var(--candle);min-height:40px}
 .cert{border:3px double var(--candle);border-radius:16px;padding:20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
 .big{font-size:40px;font-weight:800;color:var(--candle);font-variant-numeric:tabular-nums}
 .small{font-size:15px;color:var(--muted)}
+.timer{position:relative;height:28px;border-radius:999px;background:var(--night);border:1px solid var(--line);overflow:hidden}
+.tfill{position:absolute;inset:0 auto 0 0;width:100%;background:linear-gradient(90deg,var(--pumpkin),var(--candle));transition:width .1s linear}
+.tfill.low{background:var(--bad)}
+.tsec{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);text-shadow:0 1px 2px #000}
+.rules{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.nameform{display:flex;flex-direction:column;gap:6px}
+.nameform label{font-weight:700}
+.nameform input{font:inherit;min-height:52px;padding:8px 14px;border-radius:14px;border:2px solid var(--line);background:var(--night);color:var(--ink);flex:1;min-width:0}
+.nameform input:focus{outline:none;border-color:var(--candle)}
+.lb{display:flex;flex-direction:column;gap:10px;background:var(--panel2);border-radius:14px;padding:14px}
+.lbhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.tabs{display:flex;gap:6px}
+.tab{font:inherit;font-size:15px;font-weight:700;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.tab.on{background:var(--candle);border-color:var(--candle);color:#241a05}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.num{text-align:right}
+tr.me td{background:var(--okbg);font-weight:700}
+.bucket .got span.miss{background:var(--badbg);outline:1px solid var(--bad)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -151,18 +172,18 @@ const S=[
  // Raum 1
  {type:'room',r:0},
  {type:'story',r:0,lines:[['erz','Halloween, 20 Uhr. Lena und Omar stehen in der alten Villa am Hügel. Plötzlich: KNALL! Die Tür fällt zu.'],['graf','Huhuuu! Ich bin Graf Flackerlicht. Ich kann zaubern! Löst meine Rätsel – sonst bleibt ihr hier bis zum Morgen!'],['uhu','Keine Angst. Ich bin Professorin Uhu. Mit Physik kommen wir hier hinaus. Für jeden Raum leuchtet oben eine Kerze.']]},
- {type:'order',r:0,who:'uhu',say:'Naturwissenschaftler:innen arbeiten in vier Schritten.',q:'Tippe die Schritte in der richtigen Reihenfolge an.',items:['❓ Frage stellen','🧪 Experimentieren','📏 Messen','🔎 Erklären'],hint:'Was kommt ganz am Anfang? Zuerst muss man etwas wissen wollen.',ex:'Genau so: Zuerst eine Frage. Dann ein Experiment. Dabei wird gemessen. Am Ende erklären wir das Ergebnis.'},
- {type:'mc',r:0,who:'graf',say:'Mein Kürbis-Pendel sagt die Zukunft voraus! Ich habe es einmal probiert. Es hat gestimmt!',q:'Ist das wissenschaftlich?',o:[
+ {type:'order',time:30,r:0,who:'uhu',say:'Naturwissenschaftler:innen arbeiten in vier Schritten.',q:'Tippe die Schritte in der richtigen Reihenfolge an.',items:['❓ Frage stellen','🧪 Experimentieren','📏 Messen','🔎 Erklären'],hint:'Was kommt ganz am Anfang? Zuerst muss man etwas wissen wollen.',ex:'Genau so: Zuerst eine Frage. Dann ein Experiment. Dabei wird gemessen. Am Ende erklären wir das Ergebnis.'},
+ {type:'mc',time:40,r:0,who:'graf',say:'Mein Kürbis-Pendel sagt die Zukunft voraus! Ich habe es einmal probiert. Es hat gestimmt!',q:'Ist das wissenschaftlich?',o:[
    {t:'Ja. Es hat einmal funktioniert, also stimmt es.',fb:'Einmal ist zu wenig. Das kann Zufall sein.'},
    {t:'Nein. Man muss es oft wiederholen und messen. Es muss immer (ungefähr) das gleiche Ergebnis herauskommen.',ok:1,fb:'Wissenschaft heißt: wiederholen, messen, überprüfen.'},
    {t:'Ja. Ein Graf sagt immer die Wahrheit.',fb:'Wer etwas sagt, ist egal. Es zählt nur, was man überprüfen kann.'}],
   ex:'Das Pendel des Grafen ist eine <b>Scheinwissenschaft</b>: Er nimmt etwas einfach an und überprüft es nicht.'},
- {type:'sort',r:0,who:'uhu',say:'Im Schrank liegen Messgeräte. Hilf mir beim Einräumen!',q:'Was misst dieses Gerät?',buckets:[['Zeit','in s'],['Masse','in kg'],['Temperatur','in °C'],['Länge','in m']],items:[
+ {type:'sort',time:30,r:0,who:'uhu',say:'Im Schrank liegen Messgeräte. Hilf mir beim Einräumen!',q:'Was misst dieses Gerät?',buckets:[['Zeit','in s'],['Masse','in kg'],['Temperatur','in °C'],['Länge','in m']],items:[
    {i:'⏱',t:'Stoppuhr',b:0,fb:'Mit der Stoppuhr misst man, wie lange etwas dauert.'},
    {i:'⚖️',t:'Waage',b:1,fb:'Die Waage zeigt, wie schwer etwas ist.'},
    {i:'🌡',t:'Thermometer',b:2,fb:'Das Thermometer zeigt, wie warm oder kalt etwas ist.'},
    {i:'📏',t:'Maßband',b:3,fb:'Mit dem Maßband misst man, wie lang etwas ist.'}],ex:'Alles eingeräumt!'},
- {type:'mc',r:0,who:'omar',say:'Auf dem Zaubertrank-Kessel klebt ein Zettel.',q:'Welche Angabe ist eine vollständige Messung?',o:[
+ {type:'mc',time:20,r:0,who:'omar',say:'Auf dem Zaubertrank-Kessel klebt ein Zettel.',q:'Welche Angabe ist eine vollständige Messung?',o:[
    {t:'Der Kessel wiegt 12.',fb:'12 was? 12 g? 12 kg? Die Einheit fehlt.'},
    {t:'Der Kessel ist sehr schwer.',fb:'„Sehr schwer“ ist keine Messung. Da fehlt die Zahl.'},
    {t:'Der Kessel wiegt 12 kg.',ok:1,fb:'Zahlenwert (12) und Einheit (kg) – vollständig!'}],
@@ -170,35 +191,35 @@ const S=[
  // Raum 2
  {type:'room',r:1},
  {type:'dark',r:1,lines:[['erz','Die Tür zur Bibliothek geht auf. Drinnen ist es stockdunkel.'],['omar','Ich sehe gar nichts!'],['graf','Ich sehe alles! Meine Augen senden Sehstrahlen aus. Hihihi!']]},
- {type:'mc',r:1,who:'lena',say:'Jetzt sehe ich das rote Buch auf dem Tisch!',q:'Wie kommt das Bild vom Buch zu Lena?',o:[
+ {type:'mc',time:40,r:1,who:'lena',say:'Jetzt sehe ich das rote Buch auf dem Tisch!',q:'Wie kommt das Bild vom Buch zu Lena?',o:[
    {t:'👁 ➜ 📕<br>Das Auge schickt Strahlen zum Buch.',fb:'Das glaubten die Menschen im alten Griechenland. Heute wissen wir: Das Auge sendet nichts aus.'},
    {t:'🕯 ➜ 📕 ➜ 👁<br>Licht geht von der Kerze zum Buch und dann ins Auge.',ok:1,fb:'Genau! Das Auge ist ein <b>Lichtempfänger</b>.'},
    {t:'🕯 ➜ 👁 ➜ 📕<br>Licht geht von der Kerze ins Auge und dann zum Buch.',fb:'Das Licht muss <i>vom Buch</i> ins Auge kommen. Sonst sehen wir das Buch nicht.'}],
   ex:'Wir sehen einen Gegenstand nur, wenn Licht <b>von ihm</b> in unser Auge fällt.'},
- {type:'mc',r:1,who:'graf',say:'Meine Katze sieht auch in völliger Dunkelheit!',q:'Stimmt das?',o:[
+ {type:'mc',time:30,r:1,who:'graf',say:'Meine Katze sieht auch in völliger Dunkelheit!',q:'Stimmt das?',o:[
    {t:'Ja. Katzenaugen leuchten wie Taschenlampen.',fb:'Katzenaugen leuchten nicht selbst. Sie werfen nur Licht zurück, wenn Licht da ist.'},
    {t:'Nein. Ohne Licht sieht niemand etwas. Katzen brauchen aber nur sehr wenig Licht.',ok:1,fb:'Richtig. In <i>völliger</i> Dunkelheit sieht auch eine Katze nichts.'},
    {t:'Ja. Katzen senden Sehstrahlen aus.',fb:'Kein Auge sendet Sehstrahlen aus – auch kein Katzenauge.'}]},
- {type:'mc',r:1,who:'uhu',say:'Noch eine Frage zum Auge.',q:'Wo empfängt unser Auge das Licht?',o:[
+ {type:'mc',time:20,r:1,who:'uhu',say:'Noch eine Frage zum Auge.',q:'Wo empfängt unser Auge das Licht?',o:[
    {t:'auf der Netzhaut',ok:1,fb:'Die Netzhaut ist hinten im Auge. Dort kommt das Licht an.'},
    {t:'auf der Pupille',fb:'Die Pupille ist nur das Loch. Durch sie kommt das Licht hinein.'},
    {t:'im Ohr',fb:'Nein, das Ohr empfängt Schall, kein Licht.'}]},
  // Raum 3
  {type:'room',r:2},
  {type:'story',r:2,lines:[['erz','In der Dachkammer steht eine schwarze Schachtel. Vorne ist ein winziges Loch. Hinten ist Transparentpapier.'],['uhu','Das ist eine Lochkamera! Draußen vor dem Fenster steht ein Kürbis mit einer Fledermaus darüber.']]},
- {type:'mc',r:2,pics:1,who:'omar',say:'Ich schaue hinten auf das Papier …',q:'Welches Bild sieht Omar auf dem Schirm?',o:[
+ {type:'mc',time:40,r:2,pics:1,who:'omar',say:'Ich schaue hinten auf das Papier …',q:'Welches Bild sieht Omar auf dem Schirm?',o:[
    {svg:pump(''),t:'A',fb:'So sieht der Kürbis draußen aus. Auf dem Schirm ist das Bild aber anders.'},
    {svg:pump('rotate(180 60 60)'),t:'B',ok:1,fb:'Richtig! Das Bild steht auf dem Kopf und ist seitenverkehrt.'},
    {svg:pump('translate(0 120) scale(1 -1)'),t:'C',fb:'Fast! Schau auf die Fledermaus: Was draußen <i>links oben</i> ist, landet <i>rechts unten</i>.'}],
   ex:'Licht geht geradlinig durch das Loch. Die Strahlen kreuzen sich dort. Darum landet oben unten und links rechts.'+pinholeEx},
- {type:'mc',r:2,who:'uhu',say:'Unser Auge funktioniert ähnlich wie eine Lochkamera. Auf der Netzhaut steht das Bild auch auf dem Kopf.',q:'Warum sehen wir die Welt trotzdem richtig herum?',o:[
+ {type:'mc',time:30,r:2,who:'uhu',say:'Unser Auge funktioniert ähnlich wie eine Lochkamera. Auf der Netzhaut steht das Bild auch auf dem Kopf.',q:'Warum sehen wir die Welt trotzdem richtig herum?',o:[
    {t:'Unser Gehirn dreht das Bild wieder richtig herum.',ok:1,fb:'Genau! Das Gehirn „weiß“, wie das Bild gemeint ist.'},
    {t:'Die Pupille dreht das Licht zurück.',fb:'Die Pupille ist nur ein Loch. Sie dreht nichts.'},
    {t:'Das Bild auf der Netzhaut steht gar nicht auf dem Kopf.',fb:'Doch, es steht auf dem Kopf – genau wie bei der Lochkamera.'}]},
  // Raum 4
  {type:'room',r:3},
  {type:'story',r:3,lines:[['erz','Im Festsaal leuchtet und glitzert alles. Der Graf schwebt über dem Tisch.'],['graf','Alles hier leuchtet nur wegen meiner Zauberkraft!'],['lena','Das glaube ich nicht. Manche Dinge machen selbst Licht. Andere geben es nur weiter.']]},
- {type:'sort',r:3,who:'uhu',say:'Sortiere die Dinge!',q:'Selbstsender oder Zwischensender?',buckets:[['Selbstsender','erzeugt selbst Licht'],['Zwischensender','gibt Licht nur weiter']],items:[
+ {type:'sort',time:40,r:3,who:'uhu',say:'Sortiere die Dinge!',q:'Selbstsender oder Zwischensender?',buckets:[['Selbstsender','erzeugt selbst Licht'],['Zwischensender','gibt Licht nur weiter']],items:[
    {i:'🕯',t:'Kerzenflamme',b:0,fb:'Die Flamme erzeugt selbst Licht.'},
    {i:'🌕',t:'Vollmond',b:1,fb:'Achtung! Der Mond leuchtet nicht selbst. Er streut das Licht der Sonne.'},
    {i:'👻',t:'Gespenster-Laken',b:1,fb:'Das Laken erzeugt kein Licht. Es wird nur beleuchtet.'},
@@ -206,27 +227,27 @@ const S=[
    {i:'🕸',t:'Spinnennetz',b:1,fb:'Das Netz glitzert nur, weil Licht darauf fällt.'},
    {i:'📱',t:'Handy-Bildschirm (an)',b:0,fb:'Der Bildschirm erzeugt selbst Licht.'},
    {i:'☀️',t:'Sonne',b:0,fb:'Die Sonne ist der wichtigste Selbstsender für uns.'}],ex:'Super sortiert!'},
- {type:'mc',r:3,who:'omar',say:'Das Laken vom Grafen leuchtet so weiß!',q:'Warum sehen wir das weiße Laken?',o:[
+ {type:'mc',time:30,r:3,who:'omar',say:'Das Laken vom Grafen leuchtet so weiß!',q:'Warum sehen wir das weiße Laken?',o:[
    {t:'Das Laken erzeugt selbst Licht.',fb:'Ein Laken ist kein Selbstsender. Im Dunkeln sieht man es nicht.'},
    {t:'Das Laken streut das Licht der Kerzen in viele Richtungen – auch in unser Auge.',ok:1,fb:'Richtig! Das nennt man <b>Streuung</b>. Das Laken ist ein Zwischensender.'},
    {t:'Unsere Augen beleuchten das Laken.',fb:'Augen senden kein Licht aus. Sie empfangen nur.'}]},
- {type:'mc',r:3,who:'graf',say:'Meine Kerze leuchtet nur für dich, Lena!',q:'Was stimmt?',o:[
+ {type:'mc',time:30,r:3,who:'graf',say:'Meine Kerze leuchtet nur für dich, Lena!',q:'Was stimmt?',o:[
    {t:'Die Kerze leuchtet nur zu der Person, die hinschaut.',fb:'Die Kerze „weiß“ nicht, wer schaut.'},
    {t:'Die Kerze strahlt Licht in alle Richtungen. Wir sehen nur das Licht, das in unser Auge fällt.',ok:1,fb:'Genau! Deshalb sehen alle im Raum die Kerze.'},
    {t:'Die Kerze leuchtet nur nach oben.',fb:'Dann könnte man sie von der Seite nicht sehen.'}]},
  // Raum 5
  {type:'room',r:4},
  {type:'story',r:4,lines:[['erz','Oben im Turm ist ein Fenster. Draußen ist ein Gewitter. Ein Blitz! … 1 … 2 … 3 … Dann erst: BUMM! Der Donner.'],['omar','Ich habe zuerst den Blitz gesehen und erst später den Donner gehört!']]},
- {type:'mc',r:4,who:'uhu',say:'Blitz und Donner entstehen gleichzeitig.',q:'Warum sieht Omar den Blitz zuerst?',o:[
+ {type:'mc',time:20,r:4,who:'uhu',say:'Blitz und Donner entstehen gleichzeitig.',q:'Warum sieht Omar den Blitz zuerst?',o:[
    {t:'Licht ist viel schneller als Schall.',ok:1,fb:'Richtig! Das Licht ist fast sofort da. Der Schall braucht länger.'},
    {t:'Der Blitz passiert früher als der Donner.',fb:'Nein, beide entstehen gleichzeitig. Nur die Geschwindigkeit ist anders.'},
    {t:'Augen arbeiten schneller als Ohren.',fb:'Es liegt nicht an Augen und Ohren, sondern an Licht und Schall.'}]},
- {type:'mc',r:4,who:'graf',say:'Licht ist sofort überall. Das ist Magie!',q:'Wie schnell ist Licht wirklich?',o:[
+ {type:'mc',time:20,r:4,who:'graf',say:'Licht ist sofort überall. Das ist Magie!',q:'Wie schnell ist Licht wirklich?',o:[
    {t:'etwa 340 m pro Sekunde',fb:'Das ist ungefähr die Geschwindigkeit von <b>Schall</b> in Luft.'},
    {t:'etwa 300 000 km pro Sekunde',ok:1,fb:'Richtig! Das ist extrem schnell – aber nicht „sofort“. Von der Sonne zur Erde braucht Licht etwa 8 Minuten.'},
    {t:'Licht ist sofort überall. Es braucht keine Zeit.',fb:'Licht ist sehr schnell, braucht aber Zeit. Bei kurzen Wegen merken wir das nur nicht.'}]},
  {type:'fog',r:4},
- {type:'mc',r:4,who:'uhu',say:'Mit Nebel sieht man den Strahl plötzlich.',q:'Warum?',o:[
+ {type:'mc',time:30,r:4,who:'uhu',say:'Mit Nebel sieht man den Strahl plötzlich.',q:'Warum?',o:[
    {t:'Die kleinen Nebeltröpfchen streuen Licht in unser Auge.',ok:1,fb:'Genau! Den Lichtstrahl selbst sehen wir nicht. Wir sehen das Licht, das von den Tröpfchen kommt.'},
    {t:'Der Nebel erzeugt rotes Licht.',fb:'Nebel ist kein Selbstsender. Er gibt Licht nur weiter.'},
    {t:'Im Nebel wird das Licht langsamer und bleibt stehen.',fb:'Licht bleibt nicht stehen. Es geht weiter geradlinig bis zur Wand.'}],
@@ -234,57 +255,88 @@ const S=[
  // Raum 6
  {type:'room',r:5},
  {type:'slider',r:5},
- {type:'mc',r:5,who:'uhu',say:'Du hast es selbst gemessen!',q:'Was passiert mit dem Schatten, wenn das Gespenst näher zur Lampe schwebt?',o:[
+ {type:'mc',time:20,r:5,who:'uhu',say:'Du hast es selbst gemessen!',q:'Was passiert mit dem Schatten, wenn das Gespenst näher zur Lampe schwebt?',o:[
    {t:'Der Schatten wird größer.',ok:1,fb:'Richtig! Je näher an der Lampe, desto größer der Schatten.'},
    {t:'Der Schatten wird kleiner.',fb:'Schau noch einmal auf deine Messung oben.'},
    {t:'Der Schatten bleibt gleich groß.',fb:'Die Zahlen haben sich doch verändert. Schau auf deine Messung.'}]},
- {type:'mc',r:5,who:'lena',say:'Hinter dem Gespenst ist es dunkel.',q:'Wie heißt der dunkle Bereich zwischen Gespenst und Wand?',o:[
+ {type:'mc',time:20,r:5,who:'lena',say:'Hinter dem Gespenst ist es dunkel.',q:'Wie heißt der dunkle Bereich zwischen Gespenst und Wand?',o:[
    {t:'Schattenraum',ok:1,fb:'Richtig! Der dunkle Fleck auf der Wand heißt Schattenbild.'},
    {t:'Schattenbild',fb:'Das Schattenbild ist nur der Fleck <i>auf der Wand</i>. Gesucht ist der Bereich davor.'},
    {t:'Lichtfleck',fb:'Ein Lichtfleck ist hell. Hier ist es dunkel.'}]},
- {type:'mc',r:5,who:'graf',say:'Mein Schatten klebt an mir und läuft mir nach. Er ist mein Haustier!',q:'Was ist ein Schatten wirklich?',o:[
+ {type:'mc',time:30,r:5,who:'graf',say:'Mein Schatten klebt an mir und läuft mir nach. Er ist mein Haustier!',q:'Was ist ein Schatten wirklich?',o:[
    {t:'Ein dunkles Ding, das am Körper hängt.',fb:'Ein Schatten ist kein Ding. Man kann ihn nicht anfassen.'},
    {t:'Ein Bereich, in den kein Licht kommt, weil ein Körper im Weg ist.',ok:1,fb:'Genau! Bewegt sich der Körper, ändert sich auch, wo das Licht fehlt.'},
    {t:'Dunkles Licht, das vom Körper ausgeht.',fb:'Es gibt kein „dunkles Licht“. Schatten heißt: Hier fehlt Licht.'}]},
- {type:'twolamp',r:5},
- {type:'mc',r:5,who:'uhu',say:'Zwei Lampen – drei Bereiche.',q:'Warum sind A und C heller als B?',o:[
+ {type:'twolamp',time:30,r:5},
+ {type:'mc',time:30,r:5,who:'uhu',say:'Zwei Lampen – drei Bereiche.',q:'Warum sind A und C heller als B?',o:[
    {t:'Dorthin leuchtet noch eine der beiden Lampen.',ok:1,fb:'Richtig! Darum heißen sie <b>Halbschatten</b>.'},
    {t:'Dort ist der Schatten dünner.',fb:'Schatten haben keine Dicke. Es geht darum, wie viele Lampen hinleuchten.'},
    {t:'Dort leuchtet das Gespenst.',fb:'Das Gespenst ist kein Selbstsender.'}]},
- {type:'mc',r:5,who:'omar',say:'Die Sonne ist riesig. Sie ist ein flächiger Lichtsender.',q:'Warum macht sie trotzdem ziemlich scharfe Schatten?',o:[
+ {type:'mc',time:40,r:5,who:'omar',say:'Die Sonne ist riesig. Sie ist ein flächiger Lichtsender.',q:'Warum macht sie trotzdem ziemlich scharfe Schatten?',o:[
    {t:'Sie ist sehr weit weg. Darum wirkt sie fast wie ein punktförmiger Lichtsender.',ok:1,fb:'Genau! Aus großer Entfernung wirkt sie fast wie ein Punkt.'},
    {t:'Weil die Sonne nur in eine Richtung leuchtet.',fb:'Die Sonne strahlt in alle Richtungen.'},
    {t:'Weil Sonnenlicht keine Halbschatten machen kann.',fb:'Doch – der Grund ist die große Entfernung.'}]},
  {type:'end'},
 ];
-const MAX=S.reduce((a,s)=>a+(s.type==='mc'||s.type==='order'||s.type==='twolamp'?1:s.type==='sort'?s.items.length:0),0);
 
 /* ---------- Motor ---------- */
-let idx=0,score=0;
+const GAME='spukvilla';
+const MAXPTS={mc:1000,order:1000,twolamp:1000,item:400};
+const MAX=S.reduce((a,s)=>a+(s.type==='mc'||s.type==='order'||s.type==='twolamp'?1000:s.type==='sort'?s.items.length*MAXPTS.item:0),0);
+const TOTAL=S.reduce((a,s)=>a+(s.type==='mc'||s.type==='order'||s.type==='twolamp'?1:s.type==='sort'?s.items.length:0),0);
+let idx=0,score=0,correct=0,player='',timer=null;
 const stage=document.getElementById('stage');
 const $=(sel,el)=>el.querySelector(sel);
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n.toLocaleString('de-AT');
 const shuffle=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
 function addScore(n){score+=n;head()}
 function head(){
   const st=S[idx]; const done=st.type==='end'?6:(st.r??0);
   document.getElementById('candles').innerHTML=ROOMS.map((_,k)=>`<span class="${k<done?'on':''}"><svg viewBox="0 0 16 24"><rect x="5" y="10" width="6" height="13" rx="1" fill="#e9e2cf"/><path class="flame" d="M8 1c3 3 3 6 0 8c-3-2-3-5 0-8z"/></svg></span>`).join('');
-  document.getElementById('score').textContent='🎃 '+score;
+  document.getElementById('score').textContent=(player?player+' · ':'')+'🎃 '+fmt(score);
 }
 function go(){idx++;render()}
 function nextBtn(el,label='Weiter ➜'){const b=document.createElement('button');b.className='btn';b.textContent=label;b.onclick=go;el.appendChild(b);b.focus({preventScroll:true});return b}
 function render(){
-  head(); stage.innerHTML='';
+  stopTimer(); head(); stage.innerHTML='';
   const el=document.createElement('section'); el.className='card'; stage.appendChild(el);
   const st=S[idx]; if(st.r!==undefined && st.type!=='room') el.insertAdjacentHTML('beforeend',`<div class="roomtag">Raum ${st.r+1} · ${ROOMS[st.r].n}</div>`);
   T[st.type](st,el); window.scrollTo({top:0});
 }
+
+/* Timer: Balken oben in der Karte. Punkte = 500 + 500 × (Restzeit / Zeit) */
+function startTimer(el,sec,onEnd){
+  stopTimer();
+  el.insertAdjacentHTML('afterbegin',`<div class="timer" role="timer" aria-label="Restzeit"><div class="tfill"></div><span class="tsec">${sec}</span></div>`);
+  const fill=$('.tfill',el),lab=$('.tsec',el),t0=performance.now(),ms=sec*1000;
+  const t={rem:1,stopped:false};
+  t.id=setInterval(()=>{
+    const left=Math.max(0,ms-(performance.now()-t0)); t.rem=left/ms;
+    fill.style.width=(t.rem*100)+'%'; lab.textContent=Math.ceil(left/1000);
+    fill.classList.toggle('low',t.rem<.3);
+    if(left<=0){stopTimer();onEnd()}
+  },100);
+  timer=t; return t;
+}
+function stopTimer(){ if(timer){clearInterval(timer.id);timer.stopped=true;const r=timer.rem;timer=null;return r} return 0 }
+const speedPts=(rem,max=1000)=>Math.round((max/2+max/2*rem)/10)*10;
+
 const T={};
 T.title=(st,el)=>{
   el.innerHTML=`<div class="roomtag">Physik-Abenteuer zu Halloween</div><h1>Die Spukvilla am Hügel</h1>
   ${say('graf','Huhuuu … Wer traut sich in meine Villa?')}
-  <p>Hilf Lena und Omar, aus der Spukvilla zu entkommen. In jedem Raum wartet ein Rätsel. Du brauchst dein Wissen über <b>Wissenschaft</b>, <b>Licht</b>, das <b>Sehen</b> und <b>Schatten</b>.</p>
-  <p class="small">Für jede Aufgabe, die du beim ersten Versuch richtig hast, bekommst du einen Kürbis 🎃.</p>`;
-  nextBtn(el,'Abenteuer starten');
+  <p>Hilf Lena und Omar, aus der Spukvilla zu entkommen. In jedem Raum wartet ein Rätsel zu <b>Wissenschaft</b>, <b>Licht</b>, <b>Sehen</b> und <b>Schatten</b>.</p>
+  <ul class="rules"><li>⏱ Jede Frage hat eine Uhr (20 bis 40 Sekunden).</li><li>✅ Richtig und schnell = viele Punkte.</li><li>❌ Falsch oder Zeit um = 0 Punkte. Dann geht es weiter.</li></ul>
+  <form id="nameform" class="nameform"><label for="pname">Dein Name</label><div class="row"><input id="pname" maxlength="20" autocomplete="off" placeholder="z. B. Mia 2b" required><button class="btn" type="submit">Abenteuer starten</button></div><p class="small" id="nameerr" aria-live="polite"></p></form>
+  <button class="btn ghost" id="showlb">🏆 Bestenliste ansehen</button><div id="lbwrap"></div>`;
+  const f=$('#nameform',el),inp=$('#pname',el);
+  if(player)inp.value=player;
+  f.onsubmit=e=>{e.preventDefault();const n=inp.value.replace(/\s+/g,' ').trim();
+    if(n.length<2){$('#nameerr',el).textContent='Bitte gib deinen Namen ein (mindestens 2 Buchstaben).';inp.focus();return}
+    player=n.slice(0,20);score=0;correct=0;go()};
+  $('#showlb',el).onclick=()=>{$('#showlb',el).hidden=true;leaderboard($('#lbwrap',el))};
+  setTimeout(()=>inp.focus(),50);
 };
 T.room=(st,el)=>{
   const R=ROOMS[st.r];
@@ -294,50 +346,62 @@ T.room=(st,el)=>{
 };
 T.story=(st,el)=>{el.insertAdjacentHTML('beforeend',st.lines.map(([w,t])=>say(w,t)).join(''));nextBtn(el)};
 T.mc=(st,el)=>{
-  let first=true,done=false;
+  let done=false;
   el.insertAdjacentHTML('beforeend',(st.who?say(st.who,st.say):'')+`<h2 class="q">${st.q}</h2><div class="opts${st.pics?' pics':''}"></div><div class="fb" aria-live="polite"></div>`);
   const box=$('.opts',el),fb=$('.fb',el);
-  const opts=st.pics?st.o:shuffle([...st.o]);
-  opts.forEach(o=>{
-    const b=document.createElement('button');b.className='opt';b.innerHTML=(o.svg||'')+`<span>${o.t}</span>`;
-    b.onclick=()=>{
-      if(done)return;
-      if(o.ok){done=true;b.classList.add('ok');if(first)addScore(1);
-        fb.className='fb good';fb.innerHTML=`<b>${first?'Richtig! +1 🎃':'Richtig!'}</b> ${o.fb||''}${st.ex?`<p>${st.ex}</p>`:''}`;
-        box.querySelectorAll('.opt').forEach(x=>x.disabled=true);nextBtn(el);
-      }else{first=false;b.classList.add('bad');b.disabled=true;fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${o.fb} Versuch es noch einmal!`}
-    };
-    box.appendChild(b);
-  });
+  const opts=st.pics?st.o:shuffle([...st.o]); const btns=[];
+  const finish=(chosen)=>{
+    if(done)return; done=true; const rem=stopTimer();
+    btns.forEach(([b,o])=>{b.disabled=true;if(o.ok)b.classList.add('ok')});
+    const right=opts.find(o=>o.ok);
+    if(chosen&&chosen.ok){const p=speedPts(rem);addScore(p);correct++;
+      fb.className='fb good';fb.innerHTML=`<b>Richtig! +${fmt(p)} Punkte</b> ${chosen.fb||''}${st.ex?`<p>${st.ex}</p>`:''}`;}
+    else{
+      if(chosen)btns.find(([,o])=>o===chosen)[0].classList.add('bad');
+      fb.className='fb oops';fb.innerHTML=`<b>${chosen?'Leider falsch.':'⏰ Die Zeit ist um!'}</b> ${chosen?chosen.fb:''}<p>Richtig ist: <b>${right.svg?'Bild '+right.t:right.t.replace(/<br>.*/,'')}</b>. ${right.fb||''}</p>${st.ex?`<p>${st.ex}</p>`:''}`;}
+    nextBtn(el);
+  };
+  opts.forEach(o=>{const b=document.createElement('button');b.className='opt';b.innerHTML=(o.svg||'')+`<span>${o.t}</span>`;b.onclick=()=>finish(o);box.appendChild(b);btns.push([b,o])});
+  startTimer(el,st.time,()=>finish(null));
 };
 T.order=(st,el)=>{
-  let pos=0,clean=true;
+  let pos=0,miss=0,done=false;
   el.insertAdjacentHTML('beforeend',say(st.who,st.say)+`<h2 class="q">${st.q}</h2><ol class="slots">${st.items.map((_,k)=>`<li class="slot">${k+1}. …</li>`).join('')}</ol><div class="chips"></div><div class="fb" aria-live="polite"></div>`);
   const slots=el.querySelectorAll('.slot'),chips=$('.chips',el),fb=$('.fb',el);
+  const end=(ok)=>{done=true;const rem=stopTimer();
+    chips.querySelectorAll('.chip').forEach(c=>c.disabled=true);
+    if(ok){const p=Math.round(speedPts(rem)*(miss===0?1:miss===1?.6:.3)/10)*10;addScore(p);if(miss===0)correct++;
+      fb.className='fb good';fb.innerHTML=`<b>${miss===0?'Perfekt!':'Geschafft!'} +${fmt(p)} Punkte</b> ${st.ex}`;}
+    else{st.items.forEach((t,k)=>{slots[k].textContent=`${k+1}. ${t}`;slots[k].classList.add('f')});chips.innerHTML='';
+      fb.className='fb oops';fb.innerHTML=`<b>⏰ Die Zeit ist um!</b> So ist die richtige Reihenfolge. ${st.ex}`;}
+    nextBtn(el)};
   shuffle(st.items.map((t,k)=>({t,k}))).forEach(c=>{
     const b=document.createElement('button');b.className='chip';b.textContent=c.t;
-    b.onclick=()=>{
-      if(c.k===pos){slots[pos].textContent=`${pos+1}. ${c.t}`;slots[pos].classList.add('f');b.hidden=true;pos++;fb.className='fb';fb.innerHTML='';
-        if(pos===st.items.length){if(clean)addScore(1);fb.className='fb good';fb.innerHTML=`<b>${clean?'Perfekt! +1 🎃':'Geschafft!'}</b> ${st.ex}`;nextBtn(el)}
-      }else{clean=false;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${pos===0?st.hint:'Was kommt als Nächstes?'}`}
+    b.onclick=()=>{ if(done)return;
+      if(c.k===pos){slots[pos].textContent=`${pos+1}. ${c.t}`;slots[pos].classList.add('f');b.hidden=true;pos++;fb.className='fb';fb.innerHTML='';if(pos===st.items.length)end(true)}
+      else{miss++;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${pos===0?st.hint:'Was kommt als Nächstes?'} (Fehler kosten Punkte.)`}
     };
     chips.appendChild(b);
   });
+  startTimer(el,st.time,()=>end(false));
 };
 T.sort=(st,el)=>{
-  const items=shuffle([...st.items]);let k=0,first=true,busy=false;
-  el.insertAdjacentHTML('beforeend',say(st.who,st.say)+`<h2 class="q">${st.q}</h2><div class="sortcard" aria-live="polite"></div><div class="buckets"></div><div class="fb" aria-live="polite"></div>`);
+  const items=shuffle([...st.items]);let k=0,busy=false,done=false;
+  el.insertAdjacentHTML('beforeend',say(st.who,st.say)+`<h2 class="q">${st.q}</h2><p class="small">Du hast für jedes Ding nur einen Versuch.</p><div class="sortcard" aria-live="polite"></div><div class="buckets"></div><div class="fb" aria-live="polite"></div>`);
   const card=$('.sortcard',el),bk=$('.buckets',el),fb=$('.fb',el);
-  const btns=st.buckets.map(([t,d],n)=>{const b=document.createElement('button');b.className='bucket';b.innerHTML=`<span class="bt">${t}</span><span class="bd">${d}</span><span class="got"></span>`;b.onclick=()=>pick(n,b);bk.appendChild(b);return b});
-  function show(){const it=items[k];first=true;busy=false;card.innerHTML=`<div class="ic">${it.i}</div><div class="nm">${it.t}</div><div class="ct">${k+1} von ${items.length}</div>`}
-  function pick(n,b){
-    if(busy||k>=items.length)return; const it=items[k];
-    if(n===it.b){busy=true;if(first)addScore(1);$('.got',b).insertAdjacentHTML('beforeend',`<span>${it.i} ${it.t}</span>`);
-      fb.className='fb good';fb.innerHTML=`<b>${first?'Richtig! +1 🎃':'Richtig!'}</b> ${it.fb}`;k++;
-      if(k<items.length)setTimeout(show,1300);else{card.innerHTML=`<div class="ic">✨</div><div class="nm">${st.ex}</div>`;btns.forEach(x=>x.disabled=true);nextBtn(el)}
-    }else{first=false;fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${it.fb.startsWith('Achtung')?it.fb:'Überleg noch einmal.'}`}
+  const btns=st.buckets.map(([t,d],n)=>{const b=document.createElement('button');b.className='bucket';b.innerHTML=`<span class="bt">${t}</span><span class="bd">${d}</span><span class="got"></span>`;b.onclick=()=>pick(n);bk.appendChild(b);return b});
+  const put=(it,good)=>$('.got',btns[it.b]).insertAdjacentHTML('beforeend',`<span class="${good?'':'miss'}">${it.i} ${it.t}</span>`);
+  function show(){busy=false;const it=items[k];card.innerHTML=`<div class="ic">${it.i}</div><div class="nm">${it.t}</div><div class="ct">${k+1} von ${items.length}</div>`}
+  function finish(timeUp){done=true;stopTimer();btns.forEach(x=>x.disabled=true);
+    if(timeUp){for(;k<items.length;k++)put(items[k],false);fb.className='fb oops';fb.innerHTML='<b>⏰ Die Zeit ist um!</b> Die restlichen Dinge sind jetzt richtig eingeräumt (rot umrandet).'}
+    card.innerHTML=`<div class="ic">✨</div><div class="nm">${timeUp?'Zeit um':st.ex}</div>`;nextBtn(el)}
+  function pick(n){
+    if(busy||done)return; busy=true; const it=items[k];
+    if(n===it.b){const p=speedPts(timer?timer.rem:0,MAXPTS.item);addScore(p);correct++;put(it,true);fb.className='fb good';fb.innerHTML=`<b>Richtig! +${fmt(p)} Punkte</b> ${it.fb}`}
+    else{put(it,false);fb.className='fb oops';fb.innerHTML=`<b>Leider falsch.</b> Richtig ist: <b>${st.buckets[it.b][0]}</b>. ${it.fb}`}
+    k++; if(k<items.length)setTimeout(()=>{if(!done)show()},1400);else setTimeout(()=>{if(!done)finish(false)},300);
   }
-  show();
+  show(); startTimer(el,st.time,()=>{if(!done)finish(true)});
 };
 T.dark=(st,el)=>{
   el.insertAdjacentHTML('beforeend',st.lines.map(([w,t])=>say(w,t)).join('')+`<div class="scene">${libSVG}</div><div class="row"><button class="btn" id="litbtn">🕯 Kerze anzünden</button></div><div class="fb" aria-live="polite"></div>`);
@@ -376,7 +440,6 @@ T.slider=(st,el)=>{
     $('#m2',el).textContent=`Schattenbild: ${Math.round(sH)} cm hoch`;
     if(d<=80)near=true; if(d>=220)far=true;
     if(near&&far&&!shown){shown=true;fb.className='fb good';fb.innerHTML='<b>Gut gemessen!</b> Du hast beide Enden ausprobiert.';nextBtn(el)}
-    else if(!shown){fb.className='fb';fb.innerHTML=''}
   }
   r.oninput=draw; draw();
 };
@@ -395,28 +458,52 @@ T.twolamp=(st,el)=>{
   <text x="${L+16}" y="${l1-10}" fill="#bdb4d8" font-size="13">Lampe 1</text><text x="${L+16}" y="${l2+22}" fill="#bdb4d8" font-size="13">Lampe 2</text>
   <path d="M${ox-14} ${ob}V${ot+14}a14 14 0 0 1 28 0V${ob}l-7-5-7 5-7-5z" fill="#ece8f7"/>
   ${regs.map(([n,a,b,k])=>`<g class="reg" tabindex="0" role="button" aria-label="Bereich ${n}" data-k="${k}" data-n="${n}"><rect x="${W}" y="${a}" width="40" height="${b-a}" fill="${k==='kern'?'#1a1630':'#8d86a6'}" stroke="#555"/><text x="${W-14}" y="${(a+b)/2+6}" fill="#f1ecfa" font-size="18" font-weight="700" text-anchor="middle">${n}</text></g>`).join('')}`;
-  let first=true,done=false;
-  svg.querySelectorAll('.reg').forEach(g=>{
-    const act=()=>{ if(done)return;
-      if(g.dataset.k==='kern'){done=true;if(first)addScore(1);fb.className='fb good';fb.innerHTML=`<b>${first?'Richtig! +1 🎃':'Richtig!'}</b> B ist der <b>Kernschatten</b>. Hierher leuchtet keine der beiden Lampen.`;nextBtn(el)}
-      else{first=false;fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> Bei ${g.dataset.n} ist es nicht ganz dunkel. Eine Lampe leuchtet noch hierher. Das ist ein <b>Halbschatten</b>.`}};
-    g.onclick=act; g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}};
-  });
+  let done=false;
+  const finish=g=>{ if(done)return; done=true; const rem=stopTimer();
+    if(g&&g.dataset.k==='kern'){const p=speedPts(rem);addScore(p);correct++;fb.className='fb good';fb.innerHTML=`<b>Richtig! +${fmt(p)} Punkte</b> B ist der <b>Kernschatten</b>. Hierher leuchtet keine der beiden Lampen.`}
+    else{fb.className='fb oops';fb.innerHTML=`<b>${g?'Leider falsch.':'⏰ Die Zeit ist um!'}</b> ${g?`Bei ${g.dataset.n} ist es nicht ganz dunkel. Eine Lampe leuchtet noch hierher. Das ist ein <b>Halbschatten</b>. `:''}Der Kernschatten ist <b>B</b>: Hierher leuchtet keine Lampe.`}
+    nextBtn(el)};
+  svg.querySelectorAll('.reg').forEach(g=>{g.onclick=()=>finish(g);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();finish(g)}}});
+  startTimer(el,st.time,()=>finish(null));
 };
+
+/* Bestenliste */
+function startOfDay(){const d=new Date();d.setHours(0,0,0,0);return d.getTime()}
+async function leaderboard(box,me){
+  box.innerHTML=`<div class="lb"><div class="lbhead"><h2>🏆 Bestenliste</h2><div class="tabs" role="tablist"><button class="tab on" data-s="day" role="tab">Heute</button><button class="tab" data-s="all" role="tab">Alle</button></div></div><div class="lbbody"><p class="small">Lade …</p></div></div>`;
+  const body=$('.lbbody',box);
+  async function load(which){
+    box.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.s===which));
+    body.innerHTML='<p class="small">Lade …</p>';
+    try{
+      const r=await fetch(`/api/leaderboard?game=${GAME}&since=${which==='day'?startOfDay():0}`);
+      if(!r.ok)throw 0; const {entries}=await r.json();
+      if(!entries.length){body.innerHTML='<p class="small">Noch keine Einträge. Sei die oder der Erste!</p>';return}
+      body.innerHTML=`<div class="tablewrap"><table><thead><tr><th>#</th><th>Name</th><th class="num">Punkte</th><th class="num">richtig</th></tr></thead><tbody>${entries.map((e,i)=>`<tr class="${me&&e.name.toLowerCase()===me.toLowerCase()?'me':''}"><td>${i<3?['🥇','🥈','🥉'][i]:i+1}</td><td>${esc(e.name)}</td><td class="num">${fmt(e.score)}</td><td class="num">${e.correct}/${e.total}</td></tr>`).join('')}</tbody></table></div>`;
+    }catch(_){body.innerHTML='<p class="small">Die Bestenliste ist gerade nicht erreichbar.</p>'}
+  }
+  box.querySelectorAll('.tab').forEach(t=>t.onclick=()=>load(t.dataset.s));
+  load('day');
+}
+
 T.end=(st,el)=>{
   el.innerHTML=say('erz','Alle sechs Kerzen brennen. Lena leuchtet mit der Taschenlampe auf den Grafen. An der Wand ist sein Schatten – mit Füßen und Schuhen!')+
   say('lena','Gespenster sind keine Selbstsender – und sie haben keine Schuhe!')+
   say('erz','Lena zieht am Laken. Darunter steht … Herr Moder, der Hausmeister. „Ihr habt mich erwischt“, lacht er. „Mit Physik kann man eben keinen Spuk vortäuschen.“')+
-  `<div class="cert"><div class="roomtag">Urkunde</div><h2>Geisterjäger:in der Physik</h2><div class="big">${score} / ${MAX} 🎃</div>
-  <p>${score>=MAX-2?'Ausgezeichnet! Kein Gespenst kann dich mehr täuschen.':score>=MAX/2?'Gut gemacht! Schau dir die Räume noch einmal an, in denen du Fehler hattest.':'Du bist entkommen! Spiel noch einmal und sammle mehr Kürbisse.'}</p>
-  <p class="small">Du kennst jetzt: Messen · Lichtempfänger · Lochkamera · Selbstsender · Zwischensender · Streuung · Lichtgeschwindigkeit · Schattenraum · Kernschatten · Halbschatten</p></div>`;
-  const b=document.createElement('button');b.className='btn';b.textContent='Noch einmal spielen';b.onclick=()=>{idx=0;score=0;render()};el.appendChild(b);
+  `<div class="cert"><div class="roomtag">Urkunde für ${esc(player)}</div><h2>Geisterjäger:in der Physik</h2><div class="big">${fmt(score)} Punkte</div>
+  <p>${correct} von ${TOTAL} Aufgaben richtig.</p>
+  <p>${correct>=TOTAL-3?'Ausgezeichnet! Kein Gespenst kann dich mehr täuschen.':correct>=TOTAL/2?'Gut gemacht! Spiel noch einmal und werde schneller.':'Du bist entkommen! Spiel noch einmal und sammle mehr Punkte.'}</p>
+  <p class="small" id="saved" aria-live="polite">Punkte werden gespeichert …</p></div><div id="lbend"></div>`;
+  const b=document.createElement('button');b.className='btn';b.textContent='Noch einmal spielen';b.onclick=()=>{idx=0;score=0;correct=0;render()};el.appendChild(b);
+  fetch('/api/scores',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({game:GAME,name:player,score,correct,total:TOTAL})})
+    .then(r=>r.ok?r.json():Promise.reject()).then(()=>{$('#saved',el).textContent='✔ Deine Punkte sind in der Bestenliste.'})
+    .catch(()=>{$('#saved',el).textContent='Speichern hat nicht geklappt. Deine Punkte: '+fmt(score)})
+    .finally(()=>leaderboard($('#lbend',el),player));
 };
 
-window.claude?.hot?.snapshot?.(()=>({idx,score}));
-const boot=d=>{if(d&&typeof d.idx==='number'&&d.idx<S.length){idx=d.idx;score=d.score||0}render()};
-window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
+render();
 </script>
+
 
 </body>
 </html>
