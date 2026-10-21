@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}*{box-sizing:border-box}</style>
+<title>Die Spukvilla</title>
+<style>
+/* Layout: eine Spielkarte mittig, Kopfleiste mit 6 Kerzen als Fortschritt. Bewusst nur dunkles Nacht-Thema. */
+:root{
+  --night:#17142a; --panel:#221d3b; --panel2:#2d2752; --line:#3e3768;
+  --ink:#f1ecfa; --muted:#bdb4d8; --candle:#f6b847; --pumpkin:#ee7a2f;
+  --ok:#86d495; --okbg:#1f3a2c; --bad:#f58a95; --badbg:#3f1f2a;
+  --display:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+html,body{background:var(--night);color:var(--ink)}
+body{font-family:var(--body);font-size:18px;line-height:1.5;
+  background:radial-gradient(1200px 500px at 50% -10%,#2b2450 0%,var(--night) 60%) fixed var(--night);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+#app{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:.02em;color:var(--candle)}
+.candles{display:flex;gap:6px}
+.candles svg{width:16px;height:24px}
+.candles .flame{fill:#4a4366;transition:fill .4s}
+.candles .on .flame{fill:var(--candle);filter:drop-shadow(0 0 4px var(--candle))}
+.score{font-weight:700;font-variant-numeric:tabular-nums;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.roomtag{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+h1{font-family:var(--display);font-size:clamp(30px,7vw,46px);line-height:1.1;margin:0;text-wrap:balance;color:var(--candle)}
+h2{font-family:var(--display);font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
+.q{font-size:21px}
+p{margin:0}
+.say{display:flex;gap:12px;align-items:flex-start}
+.say svg.av{width:52px;height:52px;flex:none;background:var(--panel2);border-radius:50%;padding:4px}
+.say .bub{background:var(--panel2);border-radius:4px 16px 16px 16px;padding:10px 14px;min-width:0;flex:1}
+.say .who{font-size:13px;font-weight:700;color:var(--candle);text-transform:uppercase;letter-spacing:.08em;display:block}
+.say.erz .bub{background:transparent;border:1px dashed var(--line);font-style:italic;border-radius:12px}
+.btn{font:inherit;font-weight:700;min-height:52px;padding:10px 20px;border-radius:14px;border:2px solid var(--candle);background:var(--candle);color:#241a05;cursor:pointer;align-self:flex-start}
+.btn.ghost{background:transparent;color:var(--candle)}
+.btn:focus-visible,.opt:focus-visible,.chip:focus-visible,.bucket:focus-visible,.reg:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.opts{display:grid;gap:10px}
+.opts.pics{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.opt{font:inherit;text-align:left;color:var(--ink);background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:12px 16px;min-height:52px;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.opt:hover:not(:disabled){border-color:var(--candle)}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg);opacity:.75}
+.opt:disabled{cursor:default}
+.opt .pic{width:100%;height:auto;border-radius:10px}
+.fb{border-radius:12px;padding:0;min-height:0}
+.fb:empty{display:none}
+.fb.good{background:var(--okbg);border:1px solid var(--ok);padding:12px 14px}
+.fb.oops{background:var(--badbg);border:1px solid var(--bad);padding:12px 14px}
+.fb p{margin-top:6px}
+.fb svg{display:block;max-width:100%;height:auto;margin-top:10px}
+.words{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.words li{background:var(--panel2);border-radius:12px;padding:8px 12px}
+.words b{color:var(--candle)}
+.slots{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.slot{border:2px dashed var(--line);border-radius:12px;padding:10px 14px;color:var(--muted)}
+.slot.f{border-style:solid;border-color:var(--ok);color:var(--ink);background:var(--okbg)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{font:inherit;font-weight:600;color:var(--ink);background:var(--panel2);border:2px solid var(--line);border-radius:999px;padding:10px 18px;cursor:pointer;min-height:48px}
+.chip.shake{animation:shake .35s;border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.sortcard{align-self:center;text-align:center;background:var(--panel2);border:2px solid var(--candle);border-radius:18px;padding:14px 28px;min-width:200px}
+.sortcard .ic{font-size:44px;line-height:1.2}
+.sortcard .nm{font-weight:700;font-size:20px}
+.sortcard .ct{font-size:13px;color:var(--muted)}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.bucket{font:inherit;color:var(--ink);background:var(--night);border:2px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-height:90px;text-align:left}
+.bucket:hover:not(:disabled){border-color:var(--candle)}
+.bucket .bt{font-weight:800;color:var(--candle)}
+.bucket .bd{font-size:14px;color:var(--muted)}
+.bucket .got{display:flex;flex-wrap:wrap;gap:4px}
+.bucket .got span{font-size:13px;background:var(--okbg);border-radius:999px;padding:2px 8px}
+.scene{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#07060c}
+.scene svg{display:block;width:100%;height:auto}
+.vis{opacity:0;transition:opacity .8s}
+.scene.lit .vis,.scene.fog .vis{opacity:1}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.meter{font-variant-numeric:tabular-nums;font-weight:700;background:var(--panel2);border-radius:10px;padding:8px 12px}
+input[type=range]{width:100%;accent-color:var(--candle);min-height:40px}
+.warn{font-size:15px;background:#3a2a10;border:1px solid var(--candle);border-radius:10px;padding:8px 12px}
+.reg{cursor:pointer}
+.reg:hover{stroke:var(--candle);stroke-width:3}
+.cert{border:3px double var(--candle);border-radius:16px;padding:20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.big{font-size:40px;font-weight:800;color:var(--candle);font-variant-numeric:tabular-nums}
+.small{font-size:15px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <a class="brand" href="/" style="text-decoration:none">Die Spukvilla</a>
+    <div class="candles" id="candles" aria-label="Fortschritt"></div>
+    <div class="score" id="score">🎃 0</div>
+  </header>
+  <main id="stage"></main>
+</div>
+
+<script>
+/* ---------- Figuren ---------- */
+const AV={
+ uhu:['Professorin Uhu',`<svg class="av" viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="28" rx="16" ry="17" fill="#9a6b43"/><path d="M10 13l6 7M38 13l-6 7" stroke="#9a6b43" stroke-width="5" stroke-linecap="round"/><circle cx="18" cy="24" r="6" fill="#fff" stroke="#f6b847" stroke-width="2"/><circle cx="30" cy="24" r="6" fill="#fff" stroke="#f6b847" stroke-width="2"/><path d="M24 24h0" stroke="#f6b847" stroke-width="2"/><circle cx="18" cy="24" r="2.5" fill="#17142a"/><circle cx="30" cy="24" r="2.5" fill="#17142a"/><path d="M24 29l-3 3h6z" fill="#f6b847"/><ellipse cx="24" cy="39" rx="8" ry="5" fill="#c89a6e"/></svg>`],
+ graf:['Graf Flackerlicht',`<svg class="av" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 44V22a14 14 0 0 1 28 0v22l-5-4-4.5 4-4.5-4-4.5 4-4.5-4z" fill="#ece8f7"/><circle cx="19" cy="22" r="3" fill="#17142a"/><circle cx="29" cy="22" r="3" fill="#17142a"/><ellipse cx="24" cy="31" rx="3" ry="4" fill="#17142a"/></svg>`],
+ lena:['Lena',`<svg class="av" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="22" r="11" fill="#e8b48c"/><path d="M12 22q1-14 12-14t12 14q-5-6-12-6t-12 6z" fill="#5a3b1e"/><path d="M12 22q-2 10 2 16M36 22q2 10-2 16" stroke="#5a3b1e" stroke-width="4" fill="none"/><circle cx="20" cy="23" r="1.6" fill="#17142a"/><circle cx="28" cy="23" r="1.6" fill="#17142a"/><path d="M10 47q14-14 28 0" fill="#ee7a2f"/></svg>`],
+ omar:['Omar',`<svg class="av" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="23" r="11" fill="#a8734c"/><path d="M13 20q2-11 11-11t11 11q-5-4-11-4t-11 4z" fill="#1d1a1a"/><circle cx="20" cy="24" r="1.6" fill="#17142a"/><circle cx="28" cy="24" r="1.6" fill="#17142a"/><path d="M20 29q4 3 8 0" stroke="#17142a" stroke-width="1.5" fill="none"/><path d="M10 47q14-14 28 0" fill="#6d5bd0"/></svg>`],
+ erz:['',''],
+};
+function say(who,text){
+  if(who==='erz') return `<div class="say erz"><div class="bub">${text}</div></div>`;
+  const [n,svg]=AV[who];
+  return `<div class="say">${svg}<div class="bub"><span class="who">${n}</span>${text}</div></div>`;
+}
+
+/* ---------- Räume ---------- */
+const ROOMS=[
+ {n:'Die Eingangshalle',t:'Wie arbeitet Wissenschaft?',w:[['Experiment','ein Versuch: Man probiert etwas aus und beobachtet genau.'],['messen','eine Größe mit einem Messgerät bestimmen.'],['Einheit','sagt, <i>was</i> gemessen wurde, z. B. kg, s, °C.'],['Scheinwissenschaft','tut so, als wäre sie Wissenschaft. Aber nichts wird gemessen oder überprüft.']]},
+ {n:'Die dunkle Bibliothek',t:'Das Auge als Lichtempfänger',w:[['Lichtempfänger','etwas, das Licht aufnimmt. Unser Auge ist ein Lichtempfänger.'],['Pupille','das Loch im Auge. Durch die Pupille kommt Licht hinein.'],['Netzhaut','die Schicht hinten im Auge. Sie empfängt das Licht.']]},
+ {n:'Die Dachkammer',t:'Die Lochkamera',w:[['Lochkamera','eine dunkle Schachtel mit einem kleinen Loch.'],['Schirm','das Papier in der Kamera. Dort sieht man das Bild.'],['geradlinig','in einer geraden Linie, ohne Kurve.']]},
+ {n:'Der Festsaal',t:'Selbstsender und Zwischensender',w:[['Selbstsender','erzeugt selbst Licht, z. B. eine Kerze.'],['Zwischensender','erzeugt kein Licht. Er gibt Licht nur weiter.'],['Streuung','Licht wird in viele Richtungen weitergeschickt.']]},
+ {n:'Der Gewitterturm',t:'Wie breitet sich Licht aus?',w:[['Lichtgeschwindigkeit','so schnell ist Licht: etwa 300 000 km pro Sekunde.'],['geradlinig','Licht geht immer gerade aus, in alle Richtungen.']]},
+ {n:'Der Keller',t:'Schatten',w:[['Schattenraum','der dunkle Bereich hinter einem Gegenstand.'],['Schattenbild','der dunkle Fleck auf der Wand.'],['Kernschatten','ganz dunkel. Keine Lampe leuchtet hierher.'],['Halbschatten','etwas heller. Eine Lampe leuchtet noch hierher.']]},
+];
+
+/* ---------- Bilder ---------- */
+const pump=tf=>`<svg class="pic" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" rx="10" fill="#e9e1cc"/><g transform="${tf}"><path d="M58 38q2-14 12-18" stroke="#3d7a3a" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="74" rx="40" ry="32" fill="#ee7a2f"/><path d="M42 46q-8 28 0 58M78 46q8 28 0 58M60 42v64" stroke="#c75d1c" stroke-width="3" fill="none"/><path d="M8 18q7-8 13 0q7-8 13 0q-7 2-13 10q-6-8-13-10z" fill="#2a2140"/></g></svg>`;
+const pinholeEx=`<svg viewBox="0 0 300 140" aria-label="Strahlen kreuzen sich im Loch"><path d="M30 105V30" stroke="#ee7a2f" stroke-width="5"/><path d="M30 22l-8 12h16z" fill="#ee7a2f"/><rect x="150" y="20" width="120" height="100" fill="none" stroke="#bdb4d8" stroke-width="3" stroke-dasharray="0"/><rect x="146" y="64" width="8" height="12" fill="#221d3b"/><path d="M30 26L150 70L268 113M30 105L150 70L268 31" stroke="#f6b847" stroke-width="2" fill="none"/><path d="M266 34v72" stroke="#ee7a2f" stroke-width="5"/><path d="M266 116l-8-12h16z" fill="#ee7a2f"/><text x="150" y="136" fill="#bdb4d8" font-size="12" text-anchor="middle">Loch</text><text x="268" y="14" fill="#bdb4d8" font-size="12" text-anchor="middle">Schirm</text></svg>`;
+const libSVG=`<svg viewBox="0 0 600 300" aria-label="Bibliothek"><rect width="600" height="300" fill="#05040a"/>
+<defs><radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f6b847" stop-opacity=".55"/><stop offset="1" stop-color="#f6b847" stop-opacity="0"/></radialGradient></defs>
+<g class="vis"><circle cx="300" cy="190" r="260" fill="url(#glow)"/>
+<rect x="40" y="40" width="180" height="200" fill="#3b2a1f"/>${[60,110,160,210].map(y=>`<rect x="40" y="${y-6}" width="180" height="6" fill="#24180f"/>`).join('')}
+${Array.from({length:18},(_,k)=>`<rect x="${50+(k%6)*28}" y="${Math.floor(k/6)*50+60}" width="20" height="40" fill="${['#7d3b5a','#3b6d7d','#8b6d2f','#4e7d3b'][k%4]}"/>`).join('')}
+<rect x="270" y="200" width="70" height="14" fill="#5a3b1e"/><rect x="290" y="150" width="14" height="50" fill="#efe6cf"/><path d="M297 128c8 8 8 16 0 22c-8-6-8-14 0-22z" fill="#f6b847"/>
+<rect x="380" y="186" width="70" height="40" rx="3" fill="#7d3b5a"/><text x="415" y="212" fill="#efe6cf" font-size="13" text-anchor="middle">Zauber?</text>
+<path d="M500 240q-30-50 0-80l10-20 10 18 10-18 10 20q30 30 0 80z" fill="#1c1830"/><circle cx="515" cy="175" r="4" fill="#9fd46a"/><circle cx="537" cy="175" r="4" fill="#9fd46a"/></g></svg>`;
+const fogSVG=()=>`<svg viewBox="0 0 600 260" aria-label="Laserstrahl im Turm"><rect width="600" height="260" fill="#0b0918"/><rect x="560" y="0" width="40" height="260" fill="#2a2440"/>
+<rect x="30" y="118" width="60" height="24" rx="4" fill="#6d6a80"/><rect x="90" y="124" width="10" height="12" fill="#3b394a"/>
+<g class="vis">${Array.from({length:90},()=>`<circle cx="${110+Math.random()*450}" cy="${20+Math.random()*220}" r="${1+Math.random()*2.5}" fill="#c9c3dd" opacity="${.15+Math.random()*.35}"/>`).join('')}
+<line x1="100" y1="130" x2="560" y2="130" stroke="#ff3b4d" stroke-width="3" opacity=".85"/></g>
+<circle cx="561" cy="130" r="6" fill="#ff3b4d"/><circle cx="561" cy="130" r="14" fill="#ff3b4d" opacity=".25"/></svg>`;
+
+/* ---------- Spielschritte ---------- */
+const S=[
+ {type:'title'},
+ // Raum 1
+ {type:'room',r:0},
+ {type:'story',r:0,lines:[['erz','Halloween, 20 Uhr. Lena und Omar stehen in der alten Villa am Hügel. Plötzlich: KNALL! Die Tür fällt zu.'],['graf','Huhuuu! Ich bin Graf Flackerlicht. Ich kann zaubern! Löst meine Rätsel – sonst bleibt ihr hier bis zum Morgen!'],['uhu','Keine Angst. Ich bin Professorin Uhu. Mit Physik kommen wir hier hinaus. Für jeden Raum leuchtet oben eine Kerze.']]},
+ {type:'order',r:0,who:'uhu',say:'Naturwissenschaftler:innen arbeiten in vier Schritten.',q:'Tippe die Schritte in der richtigen Reihenfolge an.',items:['❓ Frage stellen','🧪 Experimentieren','📏 Messen','🔎 Erklären'],hint:'Was kommt ganz am Anfang? Zuerst muss man etwas wissen wollen.',ex:'Genau so: Zuerst eine Frage. Dann ein Experiment. Dabei wird gemessen. Am Ende erklären wir das Ergebnis.'},
+ {type:'mc',r:0,who:'graf',say:'Mein Kürbis-Pendel sagt die Zukunft voraus! Ich habe es einmal probiert. Es hat gestimmt!',q:'Ist das wissenschaftlich?',o:[
+   {t:'Ja. Es hat einmal funktioniert, also stimmt es.',fb:'Einmal ist zu wenig. Das kann Zufall sein.'},
+   {t:'Nein. Man muss es oft wiederholen und messen. Es muss immer (ungefähr) das gleiche Ergebnis herauskommen.',ok:1,fb:'Wissenschaft heißt: wiederholen, messen, überprüfen.'},
+   {t:'Ja. Ein Graf sagt immer die Wahrheit.',fb:'Wer etwas sagt, ist egal. Es zählt nur, was man überprüfen kann.'}],
+  ex:'Das Pendel des Grafen ist eine <b>Scheinwissenschaft</b>: Er nimmt etwas einfach an und überprüft es nicht.'},
+ {type:'sort',r:0,who:'uhu',say:'Im Schrank liegen Messgeräte. Hilf mir beim Einräumen!',q:'Was misst dieses Gerät?',buckets:[['Zeit','in s'],['Masse','in kg'],['Temperatur','in °C'],['Länge','in m']],items:[
+   {i:'⏱',t:'Stoppuhr',b:0,fb:'Mit der Stoppuhr misst man, wie lange etwas dauert.'},
+   {i:'⚖️',t:'Waage',b:1,fb:'Die Waage zeigt, wie schwer etwas ist.'},
+   {i:'🌡',t:'Thermometer',b:2,fb:'Das Thermometer zeigt, wie warm oder kalt etwas ist.'},
+   {i:'📏',t:'Maßband',b:3,fb:'Mit dem Maßband misst man, wie lang etwas ist.'}],ex:'Alles eingeräumt!'},
+ {type:'mc',r:0,who:'omar',say:'Auf dem Zaubertrank-Kessel klebt ein Zettel.',q:'Welche Angabe ist eine vollständige Messung?',o:[
+   {t:'Der Kessel wiegt 12.',fb:'12 was? 12 g? 12 kg? Die Einheit fehlt.'},
+   {t:'Der Kessel ist sehr schwer.',fb:'„Sehr schwer“ ist keine Messung. Da fehlt die Zahl.'},
+   {t:'Der Kessel wiegt 12 kg.',ok:1,fb:'Zahlenwert (12) und Einheit (kg) – vollständig!'}],
+  ex:'Eine physikalische Größe hat immer einen <b>Zahlenwert</b> und eine <b>Einheit</b>.'},
+ // Raum 2
+ {type:'room',r:1},
+ {type:'dark',r:1,lines:[['erz','Die Tür zur Bibliothek geht auf. Drinnen ist es stockdunkel.'],['omar','Ich sehe gar nichts!'],['graf','Ich sehe alles! Meine Augen senden Sehstrahlen aus. Hihihi!']]},
+ {type:'mc',r:1,who:'lena',say:'Jetzt sehe ich das rote Buch auf dem Tisch!',q:'Wie kommt das Bild vom Buch zu Lena?',o:[
+   {t:'👁 ➜ 📕<br>Das Auge schickt Strahlen zum Buch.',fb:'Das glaubten die Menschen im alten Griechenland. Heute wissen wir: Das Auge sendet nichts aus.'},
+   {t:'🕯 ➜ 📕 ➜ 👁<br>Licht geht von der Kerze zum Buch und dann ins Auge.',ok:1,fb:'Genau! Das Auge ist ein <b>Lichtempfänger</b>.'},
+   {t:'🕯 ➜ 👁 ➜ 📕<br>Licht geht von der Kerze ins Auge und dann zum Buch.',fb:'Das Licht muss <i>vom Buch</i> ins Auge kommen. Sonst sehen wir das Buch nicht.'}],
+  ex:'Wir sehen einen Gegenstand nur, wenn Licht <b>von ihm</b> in unser Auge fällt.'},
+ {type:'mc',r:1,who:'graf',say:'Meine Katze sieht auch in völliger Dunkelheit!',q:'Stimmt das?',o:[
+   {t:'Ja. Katzenaugen leuchten wie Taschenlampen.',fb:'Katzenaugen leuchten nicht selbst. Sie werfen nur Licht zurück, wenn Licht da ist.'},
+   {t:'Nein. Ohne Licht sieht niemand etwas. Katzen brauchen aber nur sehr wenig Licht.',ok:1,fb:'Richtig. In <i>völliger</i> Dunkelheit sieht auch eine Katze nichts.'},
+   {t:'Ja. Katzen senden Sehstrahlen aus.',fb:'Kein Auge sendet Sehstrahlen aus – auch kein Katzenauge.'}]},
+ {type:'mc',r:1,who:'uhu',say:'Noch eine Frage zum Auge.',q:'Wo empfängt unser Auge das Licht?',o:[
+   {t:'auf der Netzhaut',ok:1,fb:'Die Netzhaut ist hinten im Auge. Dort kommt das Licht an.'},
+   {t:'auf der Pupille',fb:'Die Pupille ist nur das Loch. Durch sie kommt das Licht hinein.'},
+   {t:'im Ohr',fb:'Nein, das Ohr empfängt Schall, kein Licht.'}]},
+ // Raum 3
+ {type:'room',r:2},
+ {type:'story',r:2,lines:[['erz','In der Dachkammer steht eine schwarze Schachtel. Vorne ist ein winziges Loch. Hinten ist Transparentpapier.'],['uhu','Das ist eine Lochkamera! Draußen vor dem Fenster steht ein Kürbis mit einer Fledermaus darüber.']]},
+ {type:'mc',r:2,pics:1,who:'omar',say:'Ich schaue hinten auf das Papier …',q:'Welches Bild sieht Omar auf dem Schirm?',o:[
+   {svg:pump(''),t:'A',fb:'So sieht der Kürbis draußen aus. Auf dem Schirm ist das Bild aber anders.'},
+   {svg:pump('rotate(180 60 60)'),t:'B',ok:1,fb:'Richtig! Das Bild steht auf dem Kopf und ist seitenverkehrt.'},
+   {svg:pump('translate(0 120) scale(1 -1)'),t:'C',fb:'Fast! Schau auf die Fledermaus: Was draußen <i>links oben</i> ist, landet <i>rechts unten</i>.'}],
+  ex:'Licht geht geradlinig durch das Loch. Die Strahlen kreuzen sich dort. Darum landet oben unten und links rechts.'+pinholeEx},
+ {type:'mc',r:2,who:'uhu',say:'Unser Auge funktioniert ähnlich wie eine Lochkamera. Auf der Netzhaut steht das Bild auch auf dem Kopf.',q:'Warum sehen wir die Welt trotzdem richtig herum?',o:[
+   {t:'Unser Gehirn dreht das Bild wieder richtig herum.',ok:1,fb:'Genau! Das Gehirn „weiß“, wie das Bild gemeint ist.'},
+   {t:'Die Pupille dreht das Licht zurück.',fb:'Die Pupille ist nur ein Loch. Sie dreht nichts.'},
+   {t:'Das Bild auf der Netzhaut steht gar nicht auf dem Kopf.',fb:'Doch, es steht auf dem Kopf – genau wie bei der Lochkamera.'}]},
+ // Raum 4
+ {type:'room',r:3},
+ {type:'story',r:3,lines:[['erz','Im Festsaal leuchtet und glitzert alles. Der Graf schwebt über dem Tisch.'],['graf','Alles hier leuchtet nur wegen meiner Zauberkraft!'],['lena','Das glaube ich nicht. Manche Dinge machen selbst Licht. Andere geben es nur weiter.']]},
+ {type:'sort',r:3,who:'uhu',say:'Sortiere die Dinge!',q:'Selbstsender oder Zwischensender?',buckets:[['Selbstsender','erzeugt selbst Licht'],['Zwischensender','gibt Licht nur weiter']],items:[
+   {i:'🕯',t:'Kerzenflamme',b:0,fb:'Die Flamme erzeugt selbst Licht.'},
+   {i:'🌕',t:'Vollmond',b:1,fb:'Achtung! Der Mond leuchtet nicht selbst. Er streut das Licht der Sonne.'},
+   {i:'👻',t:'Gespenster-Laken',b:1,fb:'Das Laken erzeugt kein Licht. Es wird nur beleuchtet.'},
+   {i:'🔦',t:'Taschenlampe (an)',b:0,fb:'Die Taschenlampe erzeugt selbst Licht.'},
+   {i:'🕸',t:'Spinnennetz',b:1,fb:'Das Netz glitzert nur, weil Licht darauf fällt.'},
+   {i:'📱',t:'Handy-Bildschirm (an)',b:0,fb:'Der Bildschirm erzeugt selbst Licht.'},
+   {i:'☀️',t:'Sonne',b:0,fb:'Die Sonne ist der wichtigste Selbstsender für uns.'}],ex:'Super sortiert!'},
+ {type:'mc',r:3,who:'omar',say:'Das Laken vom Grafen leuchtet so weiß!',q:'Warum sehen wir das weiße Laken?',o:[
+   {t:'Das Laken erzeugt selbst Licht.',fb:'Ein Laken ist kein Selbstsender. Im Dunkeln sieht man es nicht.'},
+   {t:'Das Laken streut das Licht der Kerzen in viele Richtungen – auch in unser Auge.',ok:1,fb:'Richtig! Das nennt man <b>Streuung</b>. Das Laken ist ein Zwischensender.'},
+   {t:'Unsere Augen beleuchten das Laken.',fb:'Augen senden kein Licht aus. Sie empfangen nur.'}]},
+ {type:'mc',r:3,who:'graf',say:'Meine Kerze leuchtet nur für dich, Lena!',q:'Was stimmt?',o:[
+   {t:'Die Kerze leuchtet nur zu der Person, die hinschaut.',fb:'Die Kerze „weiß“ nicht, wer schaut.'},
+   {t:'Die Kerze strahlt Licht in alle Richtungen. Wir sehen nur das Licht, das in unser Auge fällt.',ok:1,fb:'Genau! Deshalb sehen alle im Raum die Kerze.'},
+   {t:'Die Kerze leuchtet nur nach oben.',fb:'Dann könnte man sie von der Seite nicht sehen.'}]},
+ // Raum 5
+ {type:'room',r:4},
+ {type:'story',r:4,lines:[['erz','Oben im Turm ist ein Fenster. Draußen ist ein Gewitter. Ein Blitz! … 1 … 2 … 3 … Dann erst: BUMM! Der Donner.'],['omar','Ich habe zuerst den Blitz gesehen und erst später den Donner gehört!']]},
+ {type:'mc',r:4,who:'uhu',say:'Blitz und Donner entstehen gleichzeitig.',q:'Warum sieht Omar den Blitz zuerst?',o:[
+   {t:'Licht ist viel schneller als Schall.',ok:1,fb:'Richtig! Das Licht ist fast sofort da. Der Schall braucht länger.'},
+   {t:'Der Blitz passiert früher als der Donner.',fb:'Nein, beide entstehen gleichzeitig. Nur die Geschwindigkeit ist anders.'},
+   {t:'Augen arbeiten schneller als Ohren.',fb:'Es liegt nicht an Augen und Ohren, sondern an Licht und Schall.'}]},
+ {type:'mc',r:4,who:'graf',say:'Licht ist sofort überall. Das ist Magie!',q:'Wie schnell ist Licht wirklich?',o:[
+   {t:'etwa 340 m pro Sekunde',fb:'Das ist ungefähr die Geschwindigkeit von <b>Schall</b> in Luft.'},
+   {t:'etwa 300 000 km pro Sekunde',ok:1,fb:'Richtig! Das ist extrem schnell – aber nicht „sofort“. Von der Sonne zur Erde braucht Licht etwa 8 Minuten.'},
+   {t:'Licht ist sofort überall. Es braucht keine Zeit.',fb:'Licht ist sehr schnell, braucht aber Zeit. Bei kurzen Wegen merken wir das nur nicht.'}]},
+ {type:'fog',r:4},
+ {type:'mc',r:4,who:'uhu',say:'Mit Nebel sieht man den Strahl plötzlich.',q:'Warum?',o:[
+   {t:'Die kleinen Nebeltröpfchen streuen Licht in unser Auge.',ok:1,fb:'Genau! Den Lichtstrahl selbst sehen wir nicht. Wir sehen das Licht, das von den Tröpfchen kommt.'},
+   {t:'Der Nebel erzeugt rotes Licht.',fb:'Nebel ist kein Selbstsender. Er gibt Licht nur weiter.'},
+   {t:'Im Nebel wird das Licht langsamer und bleibt stehen.',fb:'Licht bleibt nicht stehen. Es geht weiter geradlinig bis zur Wand.'}],
+  ex:'Licht breitet sich <b>geradlinig</b> aus. Sichtbar wird es nur dort, wo es gestreut wird – an der Wand oder an kleinen Teilchen in der Luft.'},
+ // Raum 6
+ {type:'room',r:5},
+ {type:'slider',r:5},
+ {type:'mc',r:5,who:'uhu',say:'Du hast es selbst gemessen!',q:'Was passiert mit dem Schatten, wenn das Gespenst näher zur Lampe schwebt?',o:[
+   {t:'Der Schatten wird größer.',ok:1,fb:'Richtig! Je näher an der Lampe, desto größer der Schatten.'},
+   {t:'Der Schatten wird kleiner.',fb:'Schau noch einmal auf deine Messung oben.'},
+   {t:'Der Schatten bleibt gleich groß.',fb:'Die Zahlen haben sich doch verändert. Schau auf deine Messung.'}]},
+ {type:'mc',r:5,who:'lena',say:'Hinter dem Gespenst ist es dunkel.',q:'Wie heißt der dunkle Bereich zwischen Gespenst und Wand?',o:[
+   {t:'Schattenraum',ok:1,fb:'Richtig! Der dunkle Fleck auf der Wand heißt Schattenbild.'},
+   {t:'Schattenbild',fb:'Das Schattenbild ist nur der Fleck <i>auf der Wand</i>. Gesucht ist der Bereich davor.'},
+   {t:'Lichtfleck',fb:'Ein Lichtfleck ist hell. Hier ist es dunkel.'}]},
+ {type:'mc',r:5,who:'graf',say:'Mein Schatten klebt an mir und läuft mir nach. Er ist mein Haustier!',q:'Was ist ein Schatten wirklich?',o:[
+   {t:'Ein dunkles Ding, das am Körper hängt.',fb:'Ein Schatten ist kein Ding. Man kann ihn nicht anfassen.'},
+   {t:'Ein Bereich, in den kein Licht kommt, weil ein Körper im Weg ist.',ok:1,fb:'Genau! Bewegt sich der Körper, ändert sich auch, wo das Licht fehlt.'},
+   {t:'Dunkles Licht, das vom Körper ausgeht.',fb:'Es gibt kein „dunkles Licht“. Schatten heißt: Hier fehlt Licht.'}]},
+ {type:'twolamp',r:5},
+ {type:'mc',r:5,who:'uhu',say:'Zwei Lampen – drei Bereiche.',q:'Warum sind A und C heller als B?',o:[
+   {t:'Dorthin leuchtet noch eine der beiden Lampen.',ok:1,fb:'Richtig! Darum heißen sie <b>Halbschatten</b>.'},
+   {t:'Dort ist der Schatten dünner.',fb:'Schatten haben keine Dicke. Es geht darum, wie viele Lampen hinleuchten.'},
+   {t:'Dort leuchtet das Gespenst.',fb:'Das Gespenst ist kein Selbstsender.'}]},
+ {type:'mc',r:5,who:'omar',say:'Die Sonne ist riesig. Sie ist ein flächiger Lichtsender.',q:'Warum macht sie trotzdem ziemlich scharfe Schatten?',o:[
+   {t:'Sie ist sehr weit weg. Darum wirkt sie fast wie ein punktförmiger Lichtsender.',ok:1,fb:'Genau! Aus großer Entfernung wirkt sie fast wie ein Punkt.'},
+   {t:'Weil die Sonne nur in eine Richtung leuchtet.',fb:'Die Sonne strahlt in alle Richtungen.'},
+   {t:'Weil Sonnenlicht keine Halbschatten machen kann.',fb:'Doch – der Grund ist die große Entfernung.'}]},
+ {type:'end'},
+];
+const MAX=S.reduce((a,s)=>a+(s.type==='mc'||s.type==='order'||s.type==='twolamp'?1:s.type==='sort'?s.items.length:0),0);
+
+/* ---------- Motor ---------- */
+let idx=0,score=0;
+const stage=document.getElementById('stage');
+const $=(sel,el)=>el.querySelector(sel);
+const shuffle=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
+function addScore(n){score+=n;head()}
+function head(){
+  const st=S[idx]; const done=st.type==='end'?6:(st.r??0);
+  document.getElementById('candles').innerHTML=ROOMS.map((_,k)=>`<span class="${k<done?'on':''}"><svg viewBox="0 0 16 24"><rect x="5" y="10" width="6" height="13" rx="1" fill="#e9e2cf"/><path class="flame" d="M8 1c3 3 3 6 0 8c-3-2-3-5 0-8z"/></svg></span>`).join('');
+  document.getElementById('score').textContent='🎃 '+score;
+}
+function go(){idx++;render()}
+function nextBtn(el,label='Weiter ➜'){const b=document.createElement('button');b.className='btn';b.textContent=label;b.onclick=go;el.appendChild(b);b.focus({preventScroll:true});return b}
+function render(){
+  head(); stage.innerHTML='';
+  const el=document.createElement('section'); el.className='card'; stage.appendChild(el);
+  const st=S[idx]; if(st.r!==undefined && st.type!=='room') el.insertAdjacentHTML('beforeend',`<div class="roomtag">Raum ${st.r+1} · ${ROOMS[st.r].n}</div>`);
+  T[st.type](st,el); window.scrollTo({top:0});
+}
+const T={};
+T.title=(st,el)=>{
+  el.innerHTML=`<div class="roomtag">Physik-Abenteuer zu Halloween</div><h1>Die Spukvilla am Hügel</h1>
+  ${say('graf','Huhuuu … Wer traut sich in meine Villa?')}
+  <p>Hilf Lena und Omar, aus der Spukvilla zu entkommen. In jedem Raum wartet ein Rätsel. Du brauchst dein Wissen über <b>Wissenschaft</b>, <b>Licht</b>, das <b>Sehen</b> und <b>Schatten</b>.</p>
+  <p class="small">Für jede Aufgabe, die du beim ersten Versuch richtig hast, bekommst du einen Kürbis 🎃.</p>`;
+  nextBtn(el,'Abenteuer starten');
+};
+T.room=(st,el)=>{
+  const R=ROOMS[st.r];
+  el.innerHTML=`<div class="roomtag">Raum ${st.r+1} von 6</div><h1>${R.n}</h1><h2>${R.t}</h2>
+  <p class="small">Neue Wörter in diesem Raum:</p><ul class="words">${R.w.map(([w,e])=>`<li><b>${w}</b> – ${e}</li>`).join('')}</ul>`;
+  nextBtn(el,'Raum betreten');
+};
+T.story=(st,el)=>{el.insertAdjacentHTML('beforeend',st.lines.map(([w,t])=>say(w,t)).join(''));nextBtn(el)};
+T.mc=(st,el)=>{
+  let first=true,done=false;
+  el.insertAdjacentHTML('beforeend',(st.who?say(st.who,st.say):'')+`<h2 class="q">${st.q}</h2><div class="opts${st.pics?' pics':''}"></div><div class="fb" aria-live="polite"></div>`);
+  const box=$('.opts',el),fb=$('.fb',el);
+  const opts=st.pics?st.o:shuffle([...st.o]);
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.innerHTML=(o.svg||'')+`<span>${o.t}</span>`;
+    b.onclick=()=>{
+      if(done)return;
+      if(o.ok){done=true;b.classList.add('ok');if(first)addScore(1);
+        fb.className='fb good';fb.innerHTML=`<b>${first?'Richtig! +1 🎃':'Richtig!'}</b> ${o.fb||''}${st.ex?`<p>${st.ex}</p>`:''}`;
+        box.querySelectorAll('.opt').forEach(x=>x.disabled=true);nextBtn(el);
+      }else{first=false;b.classList.add('bad');b.disabled=true;fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${o.fb} Versuch es noch einmal!`}
+    };
+    box.appendChild(b);
+  });
+};
+T.order=(st,el)=>{
+  let pos=0,clean=true;
+  el.insertAdjacentHTML('beforeend',say(st.who,st.say)+`<h2 class="q">${st.q}</h2><ol class="slots">${st.items.map((_,k)=>`<li class="slot">${k+1}. …</li>`).join('')}</ol><div class="chips"></div><div class="fb" aria-live="polite"></div>`);
+  const slots=el.querySelectorAll('.slot'),chips=$('.chips',el),fb=$('.fb',el);
+  shuffle(st.items.map((t,k)=>({t,k}))).forEach(c=>{
+    const b=document.createElement('button');b.className='chip';b.textContent=c.t;
+    b.onclick=()=>{
+      if(c.k===pos){slots[pos].textContent=`${pos+1}. ${c.t}`;slots[pos].classList.add('f');b.hidden=true;pos++;fb.className='fb';fb.innerHTML='';
+        if(pos===st.items.length){if(clean)addScore(1);fb.className='fb good';fb.innerHTML=`<b>${clean?'Perfekt! +1 🎃':'Geschafft!'}</b> ${st.ex}`;nextBtn(el)}
+      }else{clean=false;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${pos===0?st.hint:'Was kommt als Nächstes?'}`}
+    };
+    chips.appendChild(b);
+  });
+};
+T.sort=(st,el)=>{
+  const items=shuffle([...st.items]);let k=0,first=true,busy=false;
+  el.insertAdjacentHTML('beforeend',say(st.who,st.say)+`<h2 class="q">${st.q}</h2><div class="sortcard" aria-live="polite"></div><div class="buckets"></div><div class="fb" aria-live="polite"></div>`);
+  const card=$('.sortcard',el),bk=$('.buckets',el),fb=$('.fb',el);
+  const btns=st.buckets.map(([t,d],n)=>{const b=document.createElement('button');b.className='bucket';b.innerHTML=`<span class="bt">${t}</span><span class="bd">${d}</span><span class="got"></span>`;b.onclick=()=>pick(n,b);bk.appendChild(b);return b});
+  function show(){const it=items[k];first=true;busy=false;card.innerHTML=`<div class="ic">${it.i}</div><div class="nm">${it.t}</div><div class="ct">${k+1} von ${items.length}</div>`}
+  function pick(n,b){
+    if(busy||k>=items.length)return; const it=items[k];
+    if(n===it.b){busy=true;if(first)addScore(1);$('.got',b).insertAdjacentHTML('beforeend',`<span>${it.i} ${it.t}</span>`);
+      fb.className='fb good';fb.innerHTML=`<b>${first?'Richtig! +1 🎃':'Richtig!'}</b> ${it.fb}`;k++;
+      if(k<items.length)setTimeout(show,1300);else{card.innerHTML=`<div class="ic">✨</div><div class="nm">${st.ex}</div>`;btns.forEach(x=>x.disabled=true);nextBtn(el)}
+    }else{first=false;fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> ${it.fb.startsWith('Achtung')?it.fb:'Überleg noch einmal.'}`}
+  }
+  show();
+};
+T.dark=(st,el)=>{
+  el.insertAdjacentHTML('beforeend',st.lines.map(([w,t])=>say(w,t)).join('')+`<div class="scene">${libSVG}</div><div class="row"><button class="btn" id="litbtn">🕯 Kerze anzünden</button></div><div class="fb" aria-live="polite"></div>`);
+  const sc=$('.scene',el),b=$('#litbtn',el),fb=$('.fb',el);let shown=false;
+  b.onclick=()=>{const on=sc.classList.toggle('lit');b.textContent=on?'Kerze ausblasen':'🕯 Kerze anzünden';
+    fb.className='fb good';fb.innerHTML=on?'<b>Jetzt siehst du alles!</b> Das Licht der Kerze fällt auf die Bücher und die Katze. Von dort kommt es in dein Auge.':'<b>Wieder dunkel.</b> Ohne Licht kommt nichts in dein Auge. Auch die Katzenaugen sind jetzt unsichtbar.';
+    if(!shown){shown=true;nextBtn(el)}};
+};
+T.fog=(st,el)=>{
+  el.insertAdjacentHTML('beforeend',say('graf','Seht meinen unsichtbaren Zauberstrahl! Nur an der Wand sieht man einen roten Punkt.')+say('lena','Das ist ein Laserpointer! Hier steht eine Nebelmaschine. Probieren wir es aus!')+`<div class="scene" id="fsc">${fogSVG()}</div><div class="row"><button class="btn" id="fogbtn">💨 Nebel an</button></div><p class="warn">⚠ Wichtig: Einen Laser nie in die Augen richten!</p><div class="fb" aria-live="polite"></div>`);
+  const sc=$('#fsc',el),b=$('#fogbtn',el),fb=$('.fb',el);let shown=false;
+  b.onclick=()=>{const on=sc.classList.toggle('fog');b.textContent=on?'💨 Nebel aus':'💨 Nebel an';
+    fb.className='fb good';fb.innerHTML=on?'<b>Jetzt sieht man den Strahl!</b> Er ist ganz gerade.':'<b>Ohne Nebel:</b> Nur der Punkt an der Wand ist zu sehen.';
+    if(on&&!shown){shown=true;nextBtn(el)}};
+};
+T.slider=(st,el)=>{
+  el.insertAdjacentHTML('beforeend',say('erz','Im Keller hängt eine einzelne Glühbirne. Dahinter ist eine weiße Wand, 300 cm entfernt. Ein kleines Gespenst (20 cm hoch) schwebt dazwischen.')+say('uhu','Wir messen! Schieb das Gespenst hin und her. Probiere ganz nah und ganz weit weg.')+
+  `<div class="scene"><svg viewBox="0 0 660 340" id="shsvg" aria-label="Schattenversuch"></svg></div>
+  <label for="dist" class="small">Abstand Gespenst – Lampe</label><input type="range" id="dist" min="50" max="250" step="10" value="150">
+  <div class="row"><span class="meter" id="m1"></span><span class="meter" id="m2"></span></div><div class="fb" aria-live="polite"></div>`);
+  const svg=$('#shsvg',el),r=$('#dist',el),fb=$('.fb',el);let near=false,far=false,shown=false;
+  const L=40,W=620,cy=170,px=(W-L)/300;
+  function draw(){
+    const d=+r.value,gx=L+d*px,h=20*px,top=cy-h/2,bot=cy+h/2;
+    const sH=20*300/d,wt=cy-sH*px/2,wb=cy+sH*px/2;
+    svg.innerHTML=`<rect width="660" height="340" fill="#1a1630"/><rect x="${W}" y="0" width="40" height="340" fill="#e9e1cc"/>
+    <path d="M${L} ${cy}L${W} ${Math.max(0,cy-170)}L${W} ${Math.min(340,cy+170)}Z" fill="#f6b847" opacity=".12"/>
+    <path d="M${gx} ${top}L${W} ${wt}L${W} ${wb}L${gx} ${bot}Z" fill="#05040a" opacity=".75"/>
+    <path d="M${L} ${cy}L${W} ${wt}M${L} ${cy}L${W} ${wb}" stroke="#f6b847" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <rect x="${W}" y="${wt}" width="40" height="${wb-wt}" fill="#2a2440"/>
+    <circle cx="${L}" cy="${cy}" r="16" fill="#f6b847" opacity=".35"/><circle cx="${L}" cy="${cy}" r="8" fill="#ffe08a"/>
+    <path d="M${gx-12} ${bot}V${top+12}a12 12 0 0 1 24 0V${bot}l-6-5-6 5-6-5z" fill="#ece8f7"/>
+    <text x="${(gx+W)/2}" y="${cy+5}" fill="#bdb4d8" font-size="14" text-anchor="middle">Schattenraum</text>
+    <text x="${W+20}" y="${Math.max(14,wt-6)}" fill="#e9e1cc" font-size="12" text-anchor="middle">Schattenbild</text>`;
+    $('#m1',el).textContent=`Abstand zur Lampe: ${d} cm`;
+    $('#m2',el).textContent=`Schattenbild: ${Math.round(sH)} cm hoch`;
+    if(d<=80)near=true; if(d>=220)far=true;
+    if(near&&far&&!shown){shown=true;fb.className='fb good';fb.innerHTML='<b>Gut gemessen!</b> Du hast beide Enden ausprobiert.';nextBtn(el)}
+    else if(!shown){fb.className='fb';fb.innerHTML=''}
+  }
+  r.oninput=draw; draw();
+};
+T.twolamp=(st,el)=>{
+  el.insertAdjacentHTML('beforeend',say('graf','Ich zünde eine zweite Lampe an! Jetzt habe ich drei Schatten. Hahaha!')+say('uhu','Auf der Wand siehst du drei Bereiche: A, B und C.')+
+  `<h2 class="q">Tippe auf den Kernschatten.</h2><div class="scene"><svg viewBox="0 0 660 340" id="tl" aria-label="Zwei Lampen"></svg></div><div class="fb" aria-live="polite"></div>`);
+  const svg=$('#tl',el),fb=$('.fb',el);
+  const L=40,W=620,ox=420,ot=150,ob=210,l1=135,l2=225,f=(W-L)/(ox-L);
+  const on=(ly,oy)=>ly+(oy-ly)*f;
+  const s1=[on(l1,ot),on(l1,ob)],s2=[on(l2,ot),on(l2,ob)];
+  const kern=[Math.max(s1[0],s2[0]),Math.min(s1[1],s2[1])];
+  const regs=[['A',s2[0],kern[0],'halb'],['B',kern[0],kern[1],'kern'],['C',kern[1],s1[1],'halb']];
+  svg.innerHTML=`<rect width="660" height="340" fill="#1a1630"/><rect x="${W}" y="0" width="40" height="340" fill="#e9e1cc"/>
+  ${[[l1,s1],[l2,s2]].map(([ly,s])=>`<path d="M${L} ${ly}L${W} ${s[0]}M${L} ${ly}L${W} ${s[1]}" stroke="#f6b847" stroke-width="1" stroke-dasharray="4 5" opacity=".7"/>`).join('')}
+  <circle cx="${L}" cy="${l1}" r="8" fill="#ffe08a"/><circle cx="${L}" cy="${l2}" r="8" fill="#ffe08a"/>
+  <text x="${L+16}" y="${l1-10}" fill="#bdb4d8" font-size="13">Lampe 1</text><text x="${L+16}" y="${l2+22}" fill="#bdb4d8" font-size="13">Lampe 2</text>
+  <path d="M${ox-14} ${ob}V${ot+14}a14 14 0 0 1 28 0V${ob}l-7-5-7 5-7-5z" fill="#ece8f7"/>
+  ${regs.map(([n,a,b,k])=>`<g class="reg" tabindex="0" role="button" aria-label="Bereich ${n}" data-k="${k}" data-n="${n}"><rect x="${W}" y="${a}" width="40" height="${b-a}" fill="${k==='kern'?'#1a1630':'#8d86a6'}" stroke="#555"/><text x="${W-14}" y="${(a+b)/2+6}" fill="#f1ecfa" font-size="18" font-weight="700" text-anchor="middle">${n}</text></g>`).join('')}`;
+  let first=true,done=false;
+  svg.querySelectorAll('.reg').forEach(g=>{
+    const act=()=>{ if(done)return;
+      if(g.dataset.k==='kern'){done=true;if(first)addScore(1);fb.className='fb good';fb.innerHTML=`<b>${first?'Richtig! +1 🎃':'Richtig!'}</b> B ist der <b>Kernschatten</b>. Hierher leuchtet keine der beiden Lampen.`;nextBtn(el)}
+      else{first=false;fb.className='fb oops';fb.innerHTML=`<b>Noch nicht.</b> Bei ${g.dataset.n} ist es nicht ganz dunkel. Eine Lampe leuchtet noch hierher. Das ist ein <b>Halbschatten</b>.`}};
+    g.onclick=act; g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}};
+  });
+};
+T.end=(st,el)=>{
+  el.innerHTML=say('erz','Alle sechs Kerzen brennen. Lena leuchtet mit der Taschenlampe auf den Grafen. An der Wand ist sein Schatten – mit Füßen und Schuhen!')+
+  say('lena','Gespenster sind keine Selbstsender – und sie haben keine Schuhe!')+
+  say('erz','Lena zieht am Laken. Darunter steht … Herr Moder, der Hausmeister. „Ihr habt mich erwischt“, lacht er. „Mit Physik kann man eben keinen Spuk vortäuschen.“')+
+  `<div class="cert"><div class="roomtag">Urkunde</div><h2>Geisterjäger:in der Physik</h2><div class="big">${score} / ${MAX} 🎃</div>
+  <p>${score>=MAX-2?'Ausgezeichnet! Kein Gespenst kann dich mehr täuschen.':score>=MAX/2?'Gut gemacht! Schau dir die Räume noch einmal an, in denen du Fehler hattest.':'Du bist entkommen! Spiel noch einmal und sammle mehr Kürbisse.'}</p>
+  <p class="small">Du kennst jetzt: Messen · Lichtempfänger · Lochkamera · Selbstsender · Zwischensender · Streuung · Lichtgeschwindigkeit · Schattenraum · Kernschatten · Halbschatten</p></div>`;
+  const b=document.createElement('button');b.className='btn';b.textContent='Noch einmal spielen';b.onclick=()=>{idx=0;score=0;render()};el.appendChild(b);
+};
+
+window.claude?.hot?.snapshot?.(()=>({idx,score}));
+const boot=d=>{if(d&&typeof d.idx==='number'&&d.idx<S.length){idx=d.idx;score=d.score||0}render()};
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
+</script>
+
+</body>
+</html>
